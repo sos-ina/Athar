@@ -81,6 +81,7 @@ def list_patients(dataset: str = "eval", category: Optional[str] = None, q: Opti
             "first_date": dates[0] if dates else None, "last_date": dates[-1] if dates else None,
             "headline": a.reasons[-1] if a.reasons else "", "key_features": [c.label for c in a.contributors if c.direction == "raises" and c.value > 0][:3],
             "data_quality_issues": len(a.data_quality),
+            "referred": bool(a.features.get("gyn_referral", 0) > 0),
             "sceptic_verdict": v["sceptic"].verdict if v["sceptic"] and v["sceptic"].ran else None,
         })
     # flags the sceptic upheld come first, then unreviewed, then flags it weakened or challenged

@@ -52,7 +52,7 @@ def decide(fs: FeatureSet, score: float | None, threshold: float) -> Decision:
         return Decision(Category.no_pattern, 4, ["No model available; rule-based checks found no override."])
 
     above = score >= threshold
-    reasons.append(f"Model score {score:.2f} is {'at or above' if above else 'below'} the operating point {threshold:.2f} (illustrative score, not a probability).")
+    reasons.append(f"Model score {score:.2f} is {'at or above' if above else 'below'} the operating point {threshold:.3g} (illustrative score, not a probability).")
 
     # 4. guardrails
     blocked = False

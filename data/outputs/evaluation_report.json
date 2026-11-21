@@ -126,7 +126,7 @@
   },
   "model_score_auc": 0.867
  },
- "pipeline": "LLM reader + model + rules + sceptic agent",
+ "pipeline": "LLM reader + model + rules + sceptic reviewer",
  "sceptic": {
   "coverage": 1.0,
   "flags_reviewed": 75,
@@ -204,6 +204,316 @@
     "n": 0,
     "label_positive": 0
    }
+  }
+ },
+ "C_rule_baselines": {
+  "description": "Guideline-only rules applied to the SAME extracted features Athar uses (no model, no LLM at decision time), scored against the hidden synthetic label. INSUFFICIENT counts as not flagged.",
+  "bootstrap": {
+   "resamples": 1000,
+   "seed": 20260101,
+   "method": "percentile 95% CI; patients resampled with replacement; all methods scored on the same resamples (paired), so differences have their own CI"
+  },
+  "n": 200,
+  "label_positive": 73,
+  "methods": {
+   "athar": {
+    "name": "Athar",
+    "definition": "Final Athar output (PATTERN WARRANTS CLINICAL REVIEW) as reported in section B.",
+    "tp": 52,
+    "fp": 23,
+    "tn": 104,
+    "fn": 21,
+    "sensitivity": {
+     "value": 0.712,
+     "ci95": [
+      0.608,
+      0.819
+     ]
+    },
+    "specificity": {
+     "value": 0.819,
+     "ci95": [
+      0.75,
+      0.881
+     ]
+    },
+    "precision": {
+     "value": 0.693,
+     "ci95": [
+      0.59,
+      0.798
+     ]
+    },
+    "flagged": {
+     "value": 75,
+     "ci95": [
+      62,
+      88
+     ]
+    },
+    "false_positives": {
+     "value": 23,
+     "ci95": [
+      14,
+      32
+     ]
+    }
+   },
+   "rule_a": {
+    "name": "Guideline rule A",
+    "definition": ">=2 separate visits with relevant pain AND >=1 strong symptom domain (painful periods, pelvic pain, pain with sex or painful bowel movements).",
+    "tp": 58,
+    "fp": 94,
+    "tn": 33,
+    "fn": 15,
+    "sensitivity": {
+     "value": 0.795,
+     "ci95": [
+      0.693,
+      0.886
+     ]
+    },
+    "specificity": {
+     "value": 0.26,
+     "ci95": [
+      0.185,
+      0.336
+     ]
+    },
+    "precision": {
+     "value": 0.382,
+     "ci95": [
+      0.312,
+      0.458
+     ]
+    },
+    "flagged": {
+     "value": 152,
+     "ci95": [
+      140,
+      165
+     ]
+    },
+    "false_positives": {
+     "value": 94,
+     "ci95": [
+      80,
+      107
+     ]
+    }
+   },
+   "rule_b": {
+    "name": "Guideline rule B",
+    "definition": "Rule A AND at least one of: non-period pain explicitly linked to the cycle, pain persisting >=8 weeks after a pain treatment was started, or pain documented after a normal investigation.",
+    "tp": 52,
+    "fp": 67,
+    "tn": 60,
+    "fn": 21,
+    "sensitivity": {
+     "value": 0.712,
+     "ci95": [
+      0.606,
+      0.812
+     ]
+    },
+    "specificity": {
+     "value": 0.472,
+     "ci95": [
+      0.389,
+      0.562
+     ]
+    },
+    "precision": {
+     "value": 0.437,
+     "ci95": [
+      0.353,
+      0.527
+     ]
+    },
+    "flagged": {
+     "value": 119,
+     "ci95": [
+      106,
+      133
+     ]
+    },
+    "false_positives": {
+     "value": 67,
+     "ci95": [
+      53,
+      80
+     ]
+    }
+   }
+  },
+  "athar_minus_rule": {
+   "rule_a": {
+    "sensitivity": {
+     "value": -0.082,
+     "ci95": [
+      -0.15,
+      -0.027
+     ]
+    },
+    "specificity": {
+     "value": 0.559,
+     "ci95": [
+      0.475,
+      0.643
+     ]
+    },
+    "precision": {
+     "value": 0.312,
+     "ci95": [
+      0.238,
+      0.393
+     ]
+    },
+    "flagged": {
+     "value": -77,
+     "ci95": [
+      -90,
+      -64
+     ]
+    },
+    "false_positives": {
+     "value": -71,
+     "ci95": [
+      -84,
+      -58
+     ]
+    }
+   },
+   "rule_b": {
+    "sensitivity": {
+     "value": 0.0,
+     "ci95": [
+      -0.076,
+      0.079
+     ]
+    },
+    "specificity": {
+     "value": 0.346,
+     "ci95": [
+      0.248,
+      0.45
+     ]
+    },
+    "precision": {
+     "value": 0.256,
+     "ci95": [
+      0.175,
+      0.345
+     ]
+    },
+    "flagged": {
+     "value": -44,
+     "ci95": [
+      -58,
+      -28
+     ]
+    },
+    "false_positives": {
+     "value": -44,
+     "ci95": [
+      -58,
+      -31
+     ]
+    }
+   }
+  },
+  "athar_auc": {
+   "value": 0.867,
+   "ci95": [
+    0.818,
+    0.916
+   ],
+   "valid_resamples": 1000,
+   "n": 200
+  },
+  "note": "Rules give yes/no flags, so they have no ROC-AUC. A difference whose CI excludes 0 is unlikely to be bootstrap noise on this synthetic set; it is still not evidence about real patients."
+ },
+ "D_misses": {
+  "description": "Patients with the hidden synthetic label whose final category was not PATTERN WARRANTS CLINICAL REVIEW.",
+  "threshold": 0.399,
+  "label_positive": 73,
+  "missed": 21,
+  "built_without_visible_pattern": {
+   "definition": "Label positive but built to show something other than a reviewable pattern (expected category is not REVIEW): silent records, isolated symptoms, sparse records, period pain only. No record-based tool can be expected to flag these.",
+   "n": 20,
+   "by_scenario": {
+    "routine_unrelated / silent": 6,
+    "isolated_symptom / isolated": 5,
+    "insufficient_records / sparse_record": 4,
+    "dysmenorrhoea_only / primary_dysmenorrhoea_like": 1,
+    "overlapping_conditions / overlap_adenomyosis": 1,
+    "pelvic_pain_no_menstrual_link / noncyclical_documentation": 1,
+    "dysmenorrhoea_only / dysmenorrhoea_persistent": 1,
+    "overlapping_conditions / overlap_fibroids": 1
+   },
+   "by_category": {
+    "NO NOTABLE PATTERN IDENTIFIED": 17,
+    "INSUFFICIENT INFORMATION": 3
+   },
+   "by_reason": {
+    "Model score below the threshold": 11,
+    "Guardrail: pain at fewer than 2 visits": 6,
+    "Guardrail: only nonspecific symptoms": 6,
+    "Pain at a single visit in a short record (needs more history)": 2,
+    "Too few documented visits (needs more history)": 1
+   },
+   "by_score_band": {
+    "At or above the threshold": 8,
+    "Close: at least half the threshold": 7,
+    "Low: under half the threshold": 5
+   },
+   "median_score": 0.369
+  },
+  "genuine_misses": {
+   "definition": "Label positive and built to show a reviewable pattern in the notes, but not flagged.",
+   "n": 1,
+   "by_scenario": {
+    "overlapping_conditions / overlap_interstitial_cystitis": 1
+   },
+   "by_category": {
+    "NO NOTABLE PATTERN IDENTIFIED": 1
+   },
+   "by_reason": {
+    "Model score below the threshold": 1
+   },
+   "by_score_band": {
+    "Low: under half the threshold": 1
+   },
+   "median_score": 0.133,
+   "common_pattern_gaps": {
+    "No pain recorded as persisting after treatment or a normal test": 1
+   },
+   "cases": [
+    {
+     "id": "EVL-0027",
+     "scenario": "overlapping_conditions",
+     "subtype": "overlap_interstitial_cystitis",
+     "category": "NO NOTABLE PATTERN IDENTIFIED",
+     "why_not_flagged": [
+      "Model score below the threshold"
+     ],
+     "score": 0.133,
+     "score_band": "Low: under half the threshold",
+     "relevant_visits": 4,
+     "pattern_gaps": [
+      "No pain recorded as persisting after treatment or a normal test"
+     ],
+     "model_lowered_by": [
+      "Visits documenting urinary pain/blood (4)",
+      "Months between first and last relevant pain (44.3)",
+      "Different strong symptom domains documented (1)"
+     ],
+     "record_gaps": [
+      "Painful bowel movements are neither documented nor explicitly denied.",
+      "Family history of endometriosis is not recorded."
+     ]
+    }
+   ]
   }
  },
  "documentation": {
@@ -673,6 +983,11 @@
     "specificity": 0.687
    },
    {
+    "t": 0.399,
+    "sensitivity": 0.801,
+    "specificity": 0.71
+   },
+   {
     "t": 0.4,
     "sensitivity": 0.794,
     "specificity": 0.714
@@ -824,6 +1139,11 @@
    }
   ],
   "chosen": 0.399,
+  "at_chosen": {
+   "t": 0.399,
+   "sensitivity": 0.801,
+   "specificity": 0.71
+  },
   "rule": "highest score threshold with out-of-fold sensitivity >= 80% on the development set",
   "n_dev": 400
  },
@@ -1019,7 +1339,14 @@
     "expected": "NO NOTABLE PATTERN IDENTIFIED",
     "scenario": "dysmenorrhoea_only",
     "subtype": "primary_dysmenorrhoea_like",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 3.0,
+     "n_strong_domains": 1.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 1.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0027",
@@ -1037,7 +1364,14 @@
     "expected": "PATTERN WARRANTS CLINICAL REVIEW",
     "scenario": "overlapping_conditions",
     "subtype": "overlap_interstitial_cystitis",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 4.0,
+     "n_strong_domains": 1.0,
+     "n_cyclical_nonmenstrual": 2.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0029",
@@ -1055,7 +1389,14 @@
     "expected": "NO NOTABLE PATTERN IDENTIFIED",
     "scenario": "overlapping_conditions",
     "subtype": "overlap_adenomyosis",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 2.0,
+     "n_strong_domains": 1.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0037",
@@ -1073,7 +1414,14 @@
     "expected": "INSUFFICIENT INFORMATION",
     "scenario": "insufficient_records",
     "subtype": "sparse_record",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 0.0,
+     "n_strong_domains": 0.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0039",
@@ -1091,7 +1439,14 @@
     "expected": "INSUFFICIENT INFORMATION",
     "scenario": "insufficient_records",
     "subtype": "sparse_record",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 1.0,
+     "n_strong_domains": 1.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0041",
@@ -1109,7 +1464,14 @@
     "expected": "INSUFFICIENT INFORMATION",
     "scenario": "insufficient_records",
     "subtype": "sparse_record",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 0.0,
+     "n_strong_domains": 0.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0049",
@@ -1127,7 +1489,14 @@
     "expected": "NO NOTABLE PATTERN IDENTIFIED",
     "scenario": "isolated_symptom",
     "subtype": "isolated",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 1.0,
+     "n_strong_domains": 1.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0051",
@@ -1145,7 +1514,14 @@
     "expected": "NO NOTABLE PATTERN IDENTIFIED",
     "scenario": "isolated_symptom",
     "subtype": "isolated",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 0.0,
+     "n_strong_domains": 0.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0053",
@@ -1163,7 +1539,14 @@
     "expected": "NO NOTABLE PATTERN IDENTIFIED",
     "scenario": "isolated_symptom",
     "subtype": "isolated",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 0.0,
+     "n_strong_domains": 0.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0075",
@@ -1181,7 +1564,14 @@
     "expected": "NO NOTABLE PATTERN IDENTIFIED",
     "scenario": "isolated_symptom",
     "subtype": "isolated",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 0.0,
+     "n_strong_domains": 0.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0092",
@@ -1199,7 +1589,14 @@
     "expected": "NO NOTABLE PATTERN IDENTIFIED",
     "scenario": "routine_unrelated",
     "subtype": "silent",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 0.0,
+     "n_strong_domains": 0.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0100",
@@ -1217,7 +1614,14 @@
     "expected": "NO NOTABLE PATTERN IDENTIFIED",
     "scenario": "routine_unrelated",
     "subtype": "silent",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 0.0,
+     "n_strong_domains": 0.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0111",
@@ -1235,7 +1639,14 @@
     "expected": "NO NOTABLE PATTERN IDENTIFIED",
     "scenario": "pelvic_pain_no_menstrual_link",
     "subtype": "noncyclical_documentation",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 4.0,
+     "n_strong_domains": 1.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 1.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0121",
@@ -1253,7 +1664,14 @@
     "expected": "INSUFFICIENT INFORMATION",
     "scenario": "insufficient_records",
     "subtype": "sparse_record",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 1.0,
+     "n_strong_domains": 1.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0125",
@@ -1271,7 +1689,14 @@
     "expected": "NO NOTABLE PATTERN IDENTIFIED",
     "scenario": "dysmenorrhoea_only",
     "subtype": "dysmenorrhoea_persistent",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 2.0,
+     "n_strong_domains": 1.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 1.0,
+     "persist_after_normal_investigation": 0.0
+    }
    }
   ],
   "false_positives_vs_label": [
@@ -1291,7 +1716,14 @@
     "expected": "PATTERN WARRANTS CLINICAL REVIEW",
     "scenario": "cyclical_pelvic_pain",
     "subtype": "mimic_cyclical",
-    "quality_issues": 1
+    "quality_issues": 1,
+    "features": {
+     "n_relevant_encounters": 4.0,
+     "n_strong_domains": 3.0,
+     "n_cyclical_nonmenstrual": 2.0,
+     "persist_after_treatment": 1.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0008",
@@ -1309,7 +1741,14 @@
     "expected": "PATTERN WARRANTS CLINICAL REVIEW",
     "scenario": "dysmenorrhoea_only",
     "subtype": "primary_dysmenorrhoea_like",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 6.0,
+     "n_strong_domains": 1.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 1.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0020",
@@ -1327,7 +1766,14 @@
     "expected": "PATTERN WARRANTS CLINICAL REVIEW",
     "scenario": "pelvic_pain_no_menstrual_link",
     "subtype": "other_pelvic_pain",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 4.0,
+     "n_strong_domains": 2.0,
+     "n_cyclical_nonmenstrual": 1.0,
+     "persist_after_treatment": 1.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0026",
@@ -1345,7 +1791,14 @@
     "expected": "PATTERN WARRANTS CLINICAL REVIEW",
     "scenario": "overlapping_conditions",
     "subtype": "overlap_pid",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 7.0,
+     "n_strong_domains": 2.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0028",
@@ -1363,7 +1816,14 @@
     "expected": "PATTERN WARRANTS CLINICAL REVIEW",
     "scenario": "overlapping_conditions",
     "subtype": "overlap_pid",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 7.0,
+     "n_strong_domains": 2.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0032",
@@ -1381,7 +1841,14 @@
     "expected": "PATTERN WARRANTS CLINICAL REVIEW",
     "scenario": "repeated_inconclusive",
     "subtype": "frequent_attender",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 10.0,
+     "n_strong_domains": 2.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 1.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0061",
@@ -1399,7 +1866,14 @@
     "expected": "PATTERN WARRANTS CLINICAL REVIEW",
     "scenario": "pelvic_pain_no_menstrual_link",
     "subtype": "other_pelvic_pain",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 4.0,
+     "n_strong_domains": 2.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 1.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0070",
@@ -1417,7 +1891,14 @@
     "expected": "PATTERN WARRANTS CLINICAL REVIEW",
     "scenario": "dysmenorrhoea_only",
     "subtype": "dysmenorrhoea_persistent",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 6.0,
+     "n_strong_domains": 1.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 1.0,
+     "persist_after_normal_investigation": 1.0
+    }
    },
    {
     "id": "EVL-0082",
@@ -1435,7 +1916,14 @@
     "expected": "PATTERN WARRANTS CLINICAL REVIEW",
     "scenario": "cyclical_pelvic_pain",
     "subtype": "mimic_cyclical",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 4.0,
+     "n_strong_domains": 3.0,
+     "n_cyclical_nonmenstrual": 2.0,
+     "persist_after_treatment": 1.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0090",
@@ -1453,7 +1941,14 @@
     "expected": "NO NOTABLE PATTERN IDENTIFIED",
     "scenario": "pelvic_pain_no_menstrual_link",
     "subtype": "other_pelvic_pain",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 2.0,
+     "n_strong_domains": 1.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 1.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0108",
@@ -1471,7 +1966,14 @@
     "expected": "NO NOTABLE PATTERN IDENTIFIED",
     "scenario": "gi_non_menstrual",
     "subtype": "ibs",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 2.0,
+     "n_strong_domains": 2.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0113",
@@ -1489,7 +1991,14 @@
     "expected": "INSUFFICIENT INFORMATION",
     "scenario": "insufficient_records",
     "subtype": "sparse_record",
-    "quality_issues": 1
+    "quality_issues": 1,
+    "features": {
+     "n_relevant_encounters": 3.0,
+     "n_strong_domains": 2.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0119",
@@ -1507,7 +2016,14 @@
     "expected": "PATTERN WARRANTS CLINICAL REVIEW",
     "scenario": "cyclical_pelvic_pain",
     "subtype": "mimic_cyclical",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 4.0,
+     "n_strong_domains": 4.0,
+     "n_cyclical_nonmenstrual": 1.0,
+     "persist_after_treatment": 1.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0141",
@@ -1525,7 +2041,14 @@
     "expected": "PATTERN WARRANTS CLINICAL REVIEW",
     "scenario": "overlapping_conditions",
     "subtype": "overlap_adenomyosis",
-    "quality_issues": 0
+    "quality_issues": 0,
+    "features": {
+     "n_relevant_encounters": 3.0,
+     "n_strong_domains": 2.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 0.0,
+     "persist_after_normal_investigation": 0.0
+    }
    },
    {
     "id": "EVL-0143",
@@ -1543,7 +2066,14 @@
     "expected": "PATTERN WARRANTS CLINICAL REVIEW",
     "scenario": "pelvic_pain_no_menstrual_link",
     "subtype": "other_pelvic_pain",
-    "quality_issues": 1
+    "quality_issues": 1,
+    "features": {
+     "n_relevant_encounters": 5.0,
+     "n_strong_domains": 2.0,
+     "n_cyclical_nonmenstrual": 0.0,
+     "persist_after_treatment": 1.0,
+     "persist_after_normal_investigation": 0.0
+    }
    }
   ]
  },

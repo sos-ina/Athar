@@ -93,15 +93,18 @@ const SHORT: Record<string, string> = {
   n_weak_symptoms: "only nonspecific symptoms", n_cyclical_nonmenstrual: "pain linked to her cycle", n_explicit_noncyclical: "pain noted as not cycle-related",
   severe_or_impact: "severe or disruptive pain", persist_after_treatment: "pain after treatment began", documented_treatment_failure: "treatment not working",
   documented_treatment_success: "improvement on treatment", persist_after_normal_investigation: "pain after a normal test", suggestive_imaging: "suggestive imaging",
-  n_alt_explanations: "another documented diagnosis", alt_explains_all: "an explanation for all symptoms", escalation: "visits increasing recently",
+  n_alt_explanations: "another diagnosis recorded (e.g. IBS), common before endometriosis is found", alt_explains_all: "an explanation for all symptoms", escalation: "visits increasing recently",
   gyn_referral: "a gynaecology referral", family_history: "family history", n_uncertain: "uncertain mentions", documentation_completeness: "how complete the notes are",
   record_span_months: "the length of her record", age: "her age",
 };
 export const shortLabel = (c: Contributor) => {
   if (c.feature === "n_weak_symptoms" && c.value === 0) return "no visits with only nonspecific symptoms";
+  if (c.feature === "n_alt_explanations" && c.value === 0) return "no other diagnosis recorded";
   const s = SHORT[c.feature] ?? c.label.toLowerCase();
   return c.feature.startsWith("n_") && c.value === 0 ? `no documented ${s}` : s;
 };
+/** Model scores are shown to two decimals; values that would round to 1.00 read as "> 0.99" (never a certainty). */
+export const fmtScore = (s: number) => (s > 0.99 ? "> 0.99" : s.toFixed(2));
 export const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export function fmtValue(c: Contributor): string {

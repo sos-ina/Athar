@@ -72,6 +72,7 @@ export interface PatientRow {
   key_features: string[];
   data_quality_issues: number;
   sceptic_verdict: "upheld" | "weakened" | "challenged" | null;
+  referred?: boolean; // gynaecology referral recorded (absent from older API versions)
 }
 
 export interface PatientList { dataset: string; extractor: string; counts: Record<CategoryKey, number>; patients: PatientRow[] }

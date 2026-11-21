@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { api, CATEGORY_KEY, CATEGORY_TEXT, Decision, fmtDate, PatientDetail } from "../api";
-import { operatingPoint, RELEVANT } from "../insight";
+import { fmtScore, operatingPoint, RELEVANT } from "../insight";
 
 type StepState = "done" | "changed" | "skipped" | "pending";
 interface Step { who: string; role: string; text: string; state: StepState }
@@ -25,7 +25,7 @@ export function AgentTrace({ d, extractor }: { d: PatientDetail; extractor: stri
     { who: "Timeline", role: "Code", state: "done",
       text: painVisits ? `Lined up ${painVisits} visits with relevant pain over ${Math.max(1, Math.round(a.features.pain_span_months ?? 0))} months and measured ${Object.keys(a.features).length} features.` : `No visits with relevant pain. Measured ${Object.keys(a.features).length} features.` },
     { who: "Model", role: "ML", state: a.model_score === null ? "skipped" : "done",
-      text: a.model_score === null ? "Not scored: the record was too thin to score." : `Pattern score ${a.model_score.toFixed(2)}${op !== null ? ` against a review threshold of ${op.toFixed(2)}` : ""}. Not a probability.` },
+      text: a.model_score === null ? "Not scored: the record was too thin to score." : `Pattern score ${fmtScore(a.model_score)}${op !== null ? ` against a review threshold of ${op}` : ""}. Not a probability.` },
     { who: "Clinical rules", role: "Code", state: "done",
       text: `${CATEGORY_TEXT[beforeKey].long}.${a.guardrails_applied.filter((g) => !g.startsWith("Flag downgraded by the sceptic")).length ? " A guardrail held the flag back." : ""}` },
     s?.ran
@@ -84,7 +84,7 @@ export function ScepticPanel({ d, onQuote }: { d: PatientDetail; onQuote: (encou
         </ul>
       )}
       {s.corrections_applied.length > 0 && (
-        <div className="sc-fixes"><p className="small"><b>Corrected before re-scoring</b>{s.score_after !== null && s.score_before !== null ? ` (score ${s.score_before.toFixed(2)} → ${s.score_after.toFixed(2)})` : ""}</p>
+        <div className="sc-fixes"><p className="small"><b>Corrected before re-scoring</b>{s.score_after !== null && s.score_before !== null ? ` (score ${fmtScore(s.score_before)} → ${fmtScore(s.score_after)})` : ""}</p>
           <ul className="plain">{s.corrections_applied.map((n, i) => <li key={i} className="small">{n}</li>)}</ul></div>
       )}
       {dropped.length > 0 && (

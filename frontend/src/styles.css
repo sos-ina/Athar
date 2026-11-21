@@ -179,6 +179,10 @@ code { font-size: 0.9em; background: var(--plum-50); padding: 0 4px; border-radi
 .today b { font-size: 1.8rem; line-height: 1; color: var(--plum); }
 .today span { font-size: 0.88rem; color: var(--ink-2); }
 
+.chip-toggle { justify-self: start; border: 1px solid var(--card-border); background: rgba(255, 255, 255, 0.8); border-radius: 999px; padding: 6px 14px; font-size: 0.82rem; color: var(--ink-2); cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
+.chip-toggle b { color: var(--ink); }
+.chip-toggle.is-on { background: var(--plum); border-color: var(--plum); color: #fff; }
+.chip-toggle.is-on b { color: #fff; }
 .wl-search { border: 1px solid var(--card-border); background: rgba(255, 255, 255, 0.8); border-radius: 999px; padding: 9px 16px; min-width: 0; }
 .wl-rail { width: 6px; height: 34px; border-radius: 3px; background: var(--line); }
 .cat-review .wl-rail { background: var(--review); }
@@ -561,6 +565,26 @@ code { font-size: 0.9em; background: var(--plum-50); padding: 0 4px; border-radi
 .two-60 { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 28px; align-items: start; }
 .perf-aside { display: grid; gap: 8px; }
 .simple tr.is-chosen td { font-weight: 700; color: var(--plum); }
+.rules-list, .rules-verdict { display: grid; gap: 6px; padding-left: 1.2em; max-width: 80ch; color: var(--ink-2); }
+.rules-verdict { color: var(--ink); }
+.table-scroll { overflow-x: auto; }
+.rules-table th[scope="row"] { font-weight: 600; color: var(--ink); white-space: nowrap; }
+.rules-table td small { display: block; color: var(--muted); font-size: 0.78rem; font-weight: 400; white-space: nowrap; }
+.miss-split { display: flex; gap: 3px; height: 34px; border-radius: 8px; overflow: hidden; font-size: 0.85rem; font-weight: 600; }
+.miss-split span { display: flex; align-items: center; padding: 0 12px; white-space: nowrap; min-width: 0; }
+.ms-silent { background: #d9cbe0; color: var(--ink); }
+.ms-lookalike { background: #b9a3c4; color: var(--ink); }
+.perf-block h3.mt { margin-top: 14px; }
+.ms-genuine { background: var(--plum); color: #fff; justify-content: center; }
+.simple td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.miss-case { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 6px; }
+.miss-case + .miss-case { margin-top: 10px; }
+.mc-head { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.mc-head span { color: var(--ink-2); font-size: 0.9rem; }
+.miss-case ul { padding-left: 1.2em; display: grid; gap: 3px; }
+.miss-callout { border-left: 3px solid var(--plum); padding: 10px 16px; display: grid; gap: 4px; max-width: 80ch; }
+.miss-callout b { color: var(--plum); }
+.miss-callout p { color: var(--ink-2); }
 .perf-caveat { font-size: 0.82rem; color: var(--muted); max-width: 90ch; }
 
 .chart { margin: 0; position: relative; display: grid; gap: 8px; }

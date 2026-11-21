@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api, CATEGORY_KEY, CATEGORY_TEXT, CategoryKey, EvidenceRef, fmtDate, PatientDetail, PatientList } from "../api";
-import { cap, RELEVANT, domains as getDomains, driverSentence, fmtValue, operatingPoint, shortLabel, Signal, signals as getSignals } from "../insight";
+import { cap, RELEVANT, domains as getDomains, driverSentence, fmtScore, fmtValue, operatingPoint, shortLabel, Signal, signals as getSignals } from "../insight";
 import { useSettings } from "../settings";
 import PatternMap, { journeySentence } from "./PatternMap";
 import SymptomWheel from "./SymptomWheel";
@@ -96,6 +96,7 @@ export default function Workstation() {
   const [err, setErr] = useState("");
   const [filter, setFilter] = useState<CategoryKey | "all">("review");
   const [q, setQ] = useState("");
+  const [notReferred, setNotReferred] = useState(false);
   const [queueOpen, setQueueOpen] = useState(false);
   const [explainOpen, setExplainOpen] = useState(false);
   const [reveal, setReveal] = useState(false);
@@ -116,7 +117,8 @@ export default function Workstation() {
     api.patient(id, settings.dataset, true).then(setD).catch((e) => setErr(e.message));
   }, [id, settings.dataset]);
 
-  const rows = useMemo(() => (list?.patients ?? []).filter((p) => (filter === "all" || p.category_key === filter) && p.patient_id.toLowerCase().includes(q.toLowerCase())), [list, filter, q]);
+  const rows = useMemo(() => (list?.patients ?? []).filter((p) => (filter === "all" || p.category_key === filter) && (!notReferred || p.referred === false) && p.patient_id.toLowerCase().includes(q.toLowerCase())), [list, filter, q, notReferred]);
+  const notReferredCount = (list?.patients ?? []).filter((p) => (filter === "all" || p.category_key === filter) && p.referred === false).length;
   const nav3 = useMemo(() => {
     const cur = list?.patients.find((p) => p.patient_id === id);
     const same = (list?.patients ?? []).filter((p) => p.category_key === cur?.category_key);
@@ -230,7 +232,7 @@ export default function Workstation() {
           <h2 className="ws-outcome">{CATEGORY_TEXT[key].long}</h2>
           {key === "review" && d.sceptic?.ran && <span className={`pill ${d.sceptic.verdict === "upheld" ? "pill-review" : "pill-insufficient"}`}>{d.sceptic.verdict === "upheld" ? "Upheld by the sceptic" : "Weakened by the sceptic"}</span>}
           <p className="ws-driver">{driverSentence(a)}</p>
-          {a.model_score !== null && <p className="ws-score">Pattern score {a.model_score.toFixed(2)}{op !== null && <>, review threshold {op.toFixed(2)}</>}. Not a probability.</p>}
+          {a.model_score !== null && <p className="ws-score">Pattern score {fmtScore(a.model_score)}{op !== null && <>, review threshold {op}</>}. Not a probability.</p>}
           <ScepticPanel d={d} onQuote={(enc, quote) => setPicked({ enc, quote })} />
           <div className="ws-sec">
             <h3>Clinical signals <span className="muted small">NICE NG73</span></h3>
@@ -265,6 +267,11 @@ export default function Workstation() {
               {ORDER.map((k) => <button key={k} role="tab" aria-selected={filter === k} onClick={() => setFilter(k)}><b>{list?.counts[k] ?? "–"}</b>{CATEGORY_TEXT[k].short}</button>)}
               <button role="tab" aria-selected={filter === "all"} onClick={() => setFilter("all")}><b>{list?.patients.length ?? "–"}</b>All</button>
             </div>
+            {list?.patients.some((p) => p.referred !== undefined) && (
+              <button className={`chip-toggle ${notReferred ? "is-on" : ""}`} aria-pressed={notReferred} onClick={() => setNotReferred(!notReferred)}>
+                Not yet referred to gynaecology <b>{notReferredCount}</b>
+              </button>
+            )}
             <input className="wl-search" placeholder="Find a patient ID" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Find a patient ID" />
             <ul className="ql-items">
               {rows.map((p) => (
